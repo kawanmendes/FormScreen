@@ -1,29 +1,30 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TextInput, Button } from "react-native";
+import { View, Text, TextInput, Button, Image, Pressable } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types/navigation";
 import { useFormContext } from "../FormContext";
+import * as ImagePicker from "expo-image-picker";
 
 type Props = NativeStackScreenProps<RootStackParamList, "FormScreen">;
 
 export default function FormScreen({ navigation, route }: Props) {
-  // Se vier id, é modo edição
   const editId = route.params?.id;
 
   const { forms, addForm, updateForm } = useFormContext();
 
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState(""); // não vamos salvar no contexto
+  const [senha, setSenha] = useState("");
   const [bio, setBio] = useState("");
+  const [foto, setFoto] = useState("");
 
-  // Preenche campos quando estiver editando
   useEffect(() => {
     if (!editId) {
       setNome("");
       setEmail("");
-      setBio("");
       setSenha("");
+      setBio("");
+      setFoto("");
       return;
     }
 
@@ -33,13 +34,50 @@ export default function FormScreen({ navigation, route }: Props) {
     setNome(user.nome);
     setEmail(user.email);
     setBio(user.bio);
+    setFoto((user as any).foto || "");
+    setSenha("");
   }, [editId, forms]);
 
+  const pickImage = async () => {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permission.granted) {
+      alert("Permissão para acessar a galeria foi negada.");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setFoto(result.assets[0].uri);
+    }
+  };
+
   const handleSave = () => {
+    if (!nome.trim() || !email.trim()) {
+      alert("Preencha nome e email.");
+      return;
+    }
+
     if (editId) {
-      updateForm(editId, { nome, email, bio });
+      updateForm(editId, {
+        nome,
+        email,
+        bio,
+        foto,
+      } as any);
     } else {
-      addForm({ nome, email, bio });
+      addForm({
+        nome,
+        email,
+        bio,
+        foto,
+      } as any);
     }
 
     navigation.navigate("ListScreen");
@@ -47,6 +85,39 @@ export default function FormScreen({ navigation, route }: Props) {
 
   return (
     <View style={{ padding: 16, gap: 12 }}>
+      <Text>Foto de perfil</Text>
+
+      <Pressable onPress={pickImage}>
+        {foto ? (
+          <Image
+            source={{ uri: foto }}
+            style={{
+              width: 120,
+              height: 120,
+              borderRadius: 60,
+              alignSelf: "center",
+              borderWidth: 1,
+              marginBottom: 8,
+            }}
+          />
+        ) : (
+          <View
+            style={{
+              width: 120,
+              height: 120,
+              borderRadius: 60,
+              alignSelf: "center",
+              borderWidth: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              marginBottom: 8,
+            }}
+          >
+            <Text>Selecionar foto</Text>
+          </View>
+        )}
+      </Pressable>
+
       <Text>Nome</Text>
       <TextInput
         value={nome}
@@ -69,25 +140,40 @@ export default function FormScreen({ navigation, route }: Props) {
 
       <Text>Senha</Text>
       <TextInput
-        placeholder="Senha"
         value={senha}
         onChangeText={setSenha}
-        style={{ borderWidth: 1, padding: 10, borderRadius: 8 }}
+        placeholder="Digite sua senha"
         secureTextEntry
+        style={{ borderWidth: 1, padding: 10, borderRadius: 8 }}
         placeholderTextColor="#999"
       />
 
       <Text>Bio</Text>
       <TextInput
-        placeholder="bio"
         value={bio}
         onChangeText={setBio}
-        style={{ borderWidth: 1, padding: 10, borderRadius: 8 }}
+        placeholder="Digite sua bio"
+        multiline
+        numberOfLines={4}
+        style={{
+          borderWidth: 1,
+          padding: 10,
+          borderRadius: 8,
+          minHeight: 100,
+          textAlignVertical: "top",
+        }}
         placeholderTextColor="#999"
       />
 
-      <Button title={editId ? "Salvar alterações" : "Salvar"} onPress={handleSave} />
-      <Button title="Listar" onPress={() => navigation.navigate("ListScreen")} />
+      <Button
+        title={editId ? "Salvar alterações" : "Salvar"}
+        onPress={handleSave}
+      />
+
+      <Button
+        title="Listar"
+        onPress={() => navigation.navigate("ListScreen")}
+      />
     </View>
   );
 }

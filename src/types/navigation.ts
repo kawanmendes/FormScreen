@@ -3,6 +3,8 @@ export type User = {
   nome: string;
   email: string;
   bio: string;
+  foto?: string;
+
 };
 
 export type RootStackParamList = {

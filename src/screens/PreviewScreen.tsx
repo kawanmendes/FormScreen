@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text } from "react-native";
+import { View, Text, Image } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types/navigation";
 
@@ -16,6 +16,18 @@ export default function PreviewScreen({ route }: Props) {
       <Text style={{ fontSize: 22, fontWeight: "700" }}>Preview</Text>
 
       <View style={{ padding: 14, borderWidth: 1, borderRadius: 10, gap: 6 }}>
+
+        <Image
+          source={{ uri: data.foto }}
+          style={{
+            width: 100,
+            height: 100,
+            borderRadius: 50,
+            alignSelf: "center",
+            marginBottom: 8,
+          }}
+          
+        />
         <Text style={{ fontSize: 16 }}>
           <Text style={{ fontWeight: "700" }}>Nome: </Text>
           {data.nome}
