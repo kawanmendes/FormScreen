@@ -1,19 +1,12 @@
-export type RootStackParamList = {
-  FormScreen: undefined;
-  ListScreen: undefined;
+export type User = {
+  id: string | number;
+  nome: string;
+  email: string;
+  bio: string;
+};
 
-  PreviewScreen:
-    | {
-        formData: {
-          nome: string;
-          email: string;
-        };
-      }
-    | {
-        user: {
-          id: string;
-          nome: string;
-          email: string;
-        };
-      };
+export type RootStackParamList = {
+  FormScreen: { id?: number } | undefined;
+  ListScreen: undefined;
+  PreviewScreen: { user: any };
 };

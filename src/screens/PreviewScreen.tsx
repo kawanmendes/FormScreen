@@ -8,6 +8,7 @@ type Props = NativeStackScreenProps<RootStackParamList, "PreviewScreen">;
 export default function PreviewScreen({ route }: Props) {
   const params = route.params;
 
+  // pega o objeto correto sem "as"
   const data = "formData" in params ? params.formData : params.user;
 
   return (
@@ -19,9 +20,15 @@ export default function PreviewScreen({ route }: Props) {
           <Text style={{ fontWeight: "700" }}>Nome: </Text>
           {data.nome}
         </Text>
+
         <Text style={{ fontSize: 16 }}>
           <Text style={{ fontWeight: "700" }}>Email: </Text>
           {data.email}
+        </Text>
+
+        <Text style={{ fontSize: 16 }}>
+          <Text style={{ fontWeight: "700" }}>Bio: </Text>
+          {data.bio ?? "—"}
         </Text>
       </View>
     </View>
